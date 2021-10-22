@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <DbInfo>
+    <ConnectionString>Data Source=localhost; Initial Catalog=XDARealTimeLightning; Integrated Security=SSPI</ConnectionString>
+  </DbInfo>
+  <SshInfo>
+    <Host></Host>
+    <User></User>
+    <KeyFile></KeyFile>
+    <PassPhrase></PassPhrase>
+  </SshInfo>
+  <TunnelInfo>
+    <LocalHost>127.0.0.1</LocalHost>
+    <LocalPort>12345</LocalPort>
+    <RemoteHost>127.0.0.1</RemoteHost>
+    <RemotePort>12345</RemotePort>
+  </TunnelInfo>
+</Configuration>

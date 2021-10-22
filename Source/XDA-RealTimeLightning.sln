@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31727.386
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{A7E74082-DC6E-46DE-B97E-EE8A328994D7}") = "XDA-RealTimeLightning", "Applications\XDA-RealTimeLightning\XDA-RealTimeLightning.csproj", "{7C63F03F-5176-4878-A562-803F51F7ADBF}"
+EndProject
+Project("{3C24BC6A-0C24-4700-A93D-6A4FAD2FCB1E}") = "XDA-RealTimeLightning-Console", "Applications\XDA-RealTimeLightning-Console\XDA-RTL-Console.csproj", "{55283222-247D-41F0-BD2E-A685468866E9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7C63F03F-5176-4878-A562-803F51F7ADBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C63F03F-5176-4878-A562-803F51F7ADBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C63F03F-5176-4878-A562-803F51F7ADBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C63F03F-5176-4878-A562-803F51F7ADBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55283222-247D-41F0-BD2E-A685468866E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55283222-247D-41F0-BD2E-A685468866E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55283222-247D-41F0-BD2E-A685468866E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55283222-247D-41F0-BD2E-A685468866E9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6BB40FE2-1894-4A35-B055-8EB507FA712A}
+	EndGlobalSection
+EndGlobal
