@@ -177,8 +177,8 @@ namespace XDARTL
                 get => _Longitude;
                 private set
                 {
-                    const double MinLongitude = -90.0D;
-                    const double MaxLongitude = 90.0D;
+                    const double MinLongitude = -180.0D;
+                    const double MaxLongitude = 180.0D;
                     if (!(MinLongitude <= value && value <= MaxLongitude))
                         throw new ArgumentOutOfRangeException($"Longitude must be between {MinLongitude} and {MaxLongitude}");
                     _Longitude = value;
