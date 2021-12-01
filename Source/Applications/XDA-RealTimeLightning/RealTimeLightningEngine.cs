@@ -320,7 +320,8 @@ namespace XDARTL
                 get => _MaximumRateOfRise;
                 private set
                 {
-                    const double MinMaximumRateOfRise = 0.0D;
+                    // Contrary to the UALF definition, it seems this value can be negative
+                    const double MinMaximumRateOfRise = -999.9D;
                     const double MaxMaximumRateOfRise = 999.9D;
                     if (!(MinMaximumRateOfRise <= value && value <= MaxMaximumRateOfRise))
                         throw new ArgumentOutOfRangeException($"Maximum Rate-of-rise must be between {MinMaximumRateOfRise} and {MaxMaximumRateOfRise}");
