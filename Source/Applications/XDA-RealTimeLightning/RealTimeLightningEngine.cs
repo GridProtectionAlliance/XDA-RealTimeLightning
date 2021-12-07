@@ -606,6 +606,8 @@ namespace XDARTL
 
                 using (IDbConnection connection = new SqlConnection(dbInfo.ConnectionString))
                 {
+                    connection.Open();
+
                     foreach (var grouping in groupings)
                         BulkInsert(connection, grouping);
                 }
