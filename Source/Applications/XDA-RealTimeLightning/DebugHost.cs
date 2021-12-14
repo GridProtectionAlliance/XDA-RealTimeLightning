@@ -68,6 +68,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GSF.IO;
 using GSF.Reflection;
@@ -117,7 +118,9 @@ namespace XDARTL
                 this.WindowState = FormWindowState.Minimized;
 
                 // Start the windows service.
-                m_serviceHost.StartDebugging(Environment.CommandLine.Split(' '));
+                // Start a new task to divorce async/await from the Windows Forms synchronization context.
+                Task startTask = Task.Run(() => m_serviceHost.StartDebugging(Environment.CommandLine.Split(' ')));
+                startTask.GetAwaiter().GetResult();
             }
         }
 
@@ -129,7 +132,9 @@ namespace XDARTL
                     m_productName), "Stop Service", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     // Stop the windows service.
-                    m_serviceHost.StopDebugging();
+                    // Start a new task to divorce async/await from the Windows Forms synchronization context.
+                    Task stopTask = Task.Run(() => m_serviceHost.StopDebugging());
+                    stopTask.GetAwaiter().GetResult();
 
                     if ((object)m_remoteConsole != null && !m_remoteConsole.HasExited)
                         m_remoteConsole.Kill();
