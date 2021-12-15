@@ -627,12 +627,6 @@ namespace XDARTL
 
                     while (!receiverCancellationToken.IsCancellationRequested)
                     {
-                        if (!stream.DataAvailable)
-                        {
-                            await Task.Delay(1000);
-                            continue;
-                        }
-
                         int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, receiverCancellationToken);
 
                         if (bytesRead == 0)
