@@ -618,22 +618,39 @@ namespace XDARTL
         {
             async Task RunReceiverAsync(AsyncBufferHandler callback, CancellationToken receiverCancellationToken)
             {
-                using (TcpClient tcpClient = new TcpClient())
+                TcpClient tcpClient = null;
+                NetworkStream stream = null;
+                CancellationTokenRegistration registration = default;
+
+                try
                 {
+                    tcpClient = new TcpClient();
                     await tcpClient.ConnectAsync(tunnelInfo.LocalHost, tunnelInfo.LocalPort);
 
-                    NetworkStream stream = tcpClient.GetStream();
-                    byte[] buffer = new byte[1024];
+                    stream = tcpClient.GetStream();
+                    registration = receiverCancellationToken.Register(() => stream.Close());
 
+                    byte[] buffer = new byte[1024];
                     while (!receiverCancellationToken.IsCancellationRequested)
                     {
-                        int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, receiverCancellationToken);
+                        int bytesRead = 0;
+                        try { bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length); }
+                        catch { if (!receiverCancellationToken.IsCancellationRequested) throw; }
+
+                        if (receiverCancellationToken.IsCancellationRequested)
+                            break;
 
                         if (bytesRead == 0)
                             throw new System.IO.EndOfStreamException();
 
                         await callback(buffer, bytesRead, receiverCancellationToken);
                     }
+                }
+                finally
+                {
+                    registration.Dispose();
+                    stream?.Dispose();
+                    tcpClient?.Dispose();
                 }
             }
 
