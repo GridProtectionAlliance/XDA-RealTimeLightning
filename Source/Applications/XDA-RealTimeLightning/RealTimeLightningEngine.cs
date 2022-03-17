@@ -623,7 +623,7 @@ namespace XDARTL
             void UpdateStrikeCount(int count)
             {
                 Interlocked.Add(ref strikeCount, count);
-                logOperation.TryRunOnceAsync();
+                logOperation.RunOnceAsync();
             }
 
             void UploadLightningData(IList<LightningInfo> lightningBuffer)
@@ -646,13 +646,13 @@ namespace XDARTL
 
             async Task DelayAndLogAsync()
             {
-                try { await Task.Delay(15000, cancellationToken); }
+                try { await Task.Delay(10000, cancellationToken); }
                 catch (TaskCanceledException) { return; }
 
                 int count = Interlocked.Exchange(ref strikeCount, 0);
 
-                if (count == 0)
-                    OnMessageLogged($"{count} strikes received in the last 15 seconds");
+                if (count > 0)
+                    OnMessageLogged($"{count} strikes received in the last 10 seconds");
             }
 
             while (!cancellationToken.IsCancellationRequested)
