@@ -52,9 +52,6 @@
     <Reference Include="GSF.ServiceProcess, Version=2.3.494.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\Dependencies\NuGet\GSF.ServiceProcess.2.3.494-beta\lib\net46\GSF.ServiceProcess.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\..\Dependencies\NuGet\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SolutionDir)\Dependencies\GSF\Newtonsoft.Json.dll</HintPath>
@@ -87,8 +84,6 @@
     <Compile Include="DebugHost.Designer.cs">
       <DependentUpon>DebugHost.cs</DependentUpon>
     </Compile>
-    <Compile Include="Logging\ServiceHelperAppender.cs" />
-    <Compile Include="Logging\SimpleLogger.cs" />
     <Compile Include="RealTimeLightningEngine.cs" />
     <Compile Include="ServiceHost.cs">
       <SubType>Component</SubType>

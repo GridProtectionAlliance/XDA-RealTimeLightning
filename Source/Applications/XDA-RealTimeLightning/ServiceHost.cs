@@ -31,10 +31,6 @@ using GSF;
 using GSF.Configuration;
 using GSF.IO;
 using GSF.ServiceProcess;
-using log4net.Appender;
-using log4net.Config;
-using log4net.Layout;
-using XDARTL.Logging;
 
 namespace XDARTL
 {
@@ -74,41 +70,10 @@ namespace XDARTL
 
         private void ServiceHelper_ServiceStarted(object sender, EventArgs e)
         {
-            ServiceHelperAppender serviceHelperAppender;
-            RollingFileAppender debugLogAppender;
-
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
 
             // Set current working directory to fix relative paths
             Directory.SetCurrentDirectory(FilePath.GetAbsolutePath(""));
-
-            // Set up logging
-            serviceHelperAppender = new ServiceHelperAppender(m_serviceHelper);
-
-            debugLogAppender = new RollingFileAppender();
-            debugLogAppender.StaticLogFileName = false;
-            debugLogAppender.AppendToFile = true;
-            debugLogAppender.RollingStyle = RollingFileAppender.RollingMode.Composite;
-            debugLogAppender.MaxSizeRollBackups = 10;
-            debugLogAppender.PreserveLogFileNameExtension = true;
-            debugLogAppender.MaximumFileSize = "1MB";
-            debugLogAppender.Layout = new PatternLayout("%date [%thread] %-5level %logger - %message%newline");
-
-            try
-            {
-                if (!Directory.Exists("Debug"))
-                    Directory.CreateDirectory("Debug");
-
-                debugLogAppender.File = @"Debug\XDA-RTL.log";
-            }
-            catch (Exception ex)
-            {
-                debugLogAppender.File = "XDA-RTL.log";
-                m_serviceHelper.ErrorLogger.Log(ex);
-            }
-
-            debugLogAppender.ActivateOptions();
-            BasicConfigurator.Configure(serviceHelperAppender, debugLogAppender);
 
             // Set up heartbeat and client request handlers
             m_serviceHelper.ClientRequestHandlers.Add(new ClientRequestHandler("RestartEngine", "Restarts the real-time lightning data processing engine", RestartEngineRequestHandler));
