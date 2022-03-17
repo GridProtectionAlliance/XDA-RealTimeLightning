@@ -784,7 +784,7 @@ namespace XDARTL
                 {
                     DateTime threshold = DateTime.UtcNow.AddDays(-14);
 
-                    using (AdoDataConnection connection = new AdoDataConnection(dbInfo.ConnectionString))
+                    using (AdoDataConnection connection = new AdoDataConnection(dbInfo.ConnectionString, typeof(SqlConnection), typeof(SqlDataAdapter)))
                         connection.ExecuteNonQuery("DELETE FROM RTLightningStrike WHERE StrikeTime < {0}", threshold);
 
                     try { await Task.Delay(interval, cancellationToken); }
