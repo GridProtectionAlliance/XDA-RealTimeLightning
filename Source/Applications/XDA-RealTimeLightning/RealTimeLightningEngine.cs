@@ -447,6 +447,7 @@ namespace XDARTL
         public event EventHandler<EventArgs<string>> WarningLogged;
         public event EventHandler<EventArgs<Exception>> TunnelException;
         public event EventHandler<EventArgs<Exception>> LightningException;
+        public event EventHandler<EventArgs<Exception>> PurgeException;
 
         #endregion
 
@@ -778,14 +779,20 @@ namespace XDARTL
         {
             await Task.Run(async () =>
             {
-                TimeSpan interval = TimeSpan.FromHours(4);
-
-                while (!cancellationToken.IsCancellationRequested)
+                void RunPurgeQuery()
                 {
                     DateTime threshold = DateTime.UtcNow.AddDays(-14);
 
                     using (AdoDataConnection connection = new AdoDataConnection(dbInfo.ConnectionString, typeof(SqlConnection), typeof(SqlDataAdapter)))
                         connection.ExecuteNonQuery("DELETE FROM RTLightningStrike WHERE StrikeTime < {0}", threshold);
+                }
+
+                TimeSpan interval = TimeSpan.FromHours(4);
+
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    try { RunPurgeQuery(); }
+                    catch (Exception ex) { OnPurgeException(ex); }
 
                     try { await Task.Delay(interval, cancellationToken); }
                     catch (TaskCanceledException) { break; }
@@ -879,6 +886,9 @@ namespace XDARTL
 
         private void OnLightningException(Exception ex) =>
             LightningException?.Invoke(this, new EventArgs<Exception>(ex));
+
+        private void OnPurgeException(Exception ex) =>
+            PurgeException?.Invoke(this, new EventArgs<Exception>(ex));
 
         #endregion
     }

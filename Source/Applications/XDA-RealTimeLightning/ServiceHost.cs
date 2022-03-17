@@ -166,6 +166,9 @@ namespace XDARTL
                 engine.LightningException += (_, args) =>
                     WrapException("Exception encountered processing real-time lightning data", args.Argument);
 
+                engine.PurgeException += (_, args) =>
+                    WrapException("Exception encountered purging old lightning data", args.Argument);
+
                 try { await engine.RunAsync(cancellationTokenSource.Token); }
                 catch (Exception ex) { WrapException("Exception encountered when running the engine", ex); }
             }
