@@ -545,6 +545,19 @@ namespace XDARTL
                 command.Parameters.Add(parameter);
             }
 
+            void ConfigureParameters(IDbCommand command, IEnumerable<DbValue> dbValues)
+            {
+                command.Parameters.Clear();
+
+                int i = 0;
+                foreach (DbValue dbValue in dbValues)
+                {
+                    string parameterName = $"@p{i}";
+                    AddParameter(command, parameterName, dbValue);
+                    i++;
+                }
+            }
+
             void BulkInsert(IDbConnection connection, IEnumerable<LightningInfo> lightningData)
             {
                 string GetValuesList(int index)
@@ -569,16 +582,41 @@ namespace XDARTL
                 using (IDbCommand command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-
-                    int i = 0;
-                    foreach (DbValue dbValue in dbValues)
-                    {
-                        string parameterName = $"@p{i}";
-                        AddParameter(command, parameterName, dbValue);
-                        i++;
-                    }
-
+                    ConfigureParameters(command, dbValues);
                     command.ExecuteNonQuery();
+                }
+            }
+
+            void InsertEach(IDbConnection connection, IEnumerable<LightningInfo> lightningData)
+            {
+                void HandleSqlException(SqlException ex)
+                {
+                    // Ignore duplicate key violations
+                    if (ex.Number == 2627)
+                        return;
+
+                    OnLightningException(ex);
+                }
+
+                IEnumerable<string> parameterNames = Enumerable
+                    .Range(0, ParameterCount)
+                    .Select(i => $"@p{i}");
+
+                string commaSeparatedList = string.Join(",", parameterNames);
+                string query = $"INSERT INTO RTLightningStrike VALUES ({commaSeparatedList})";
+
+                using (IDbCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = query;
+
+                    foreach (LightningInfo lightningInfo in lightningData)
+                    {
+                        IEnumerable<DbValue> dbValues = ToParameters(lightningInfo);
+                        ConfigureParameters(command, dbValues);
+                        try { command.ExecuteNonQuery(); }
+                        catch (SqlException ex) { HandleSqlException(ex); }
+                        catch (Exception ex) { OnLightningException(ex); }
+                    }
                 }
             }
 
@@ -586,6 +624,24 @@ namespace XDARTL
             {
                 Interlocked.Add(ref strikeCount, count);
                 logOperation.TryRunOnceAsync();
+            }
+
+            void UploadLightningData(IList<LightningInfo> lightningBuffer)
+            {
+                var groupings = lightningBuffer
+                    .Select((Info, Index) => new { Info, Index })
+                    .GroupBy(obj => obj.Index / GroupLimit, obj => obj.Info);
+
+                using (IDbConnection connection = new SqlConnection(dbInfo.ConnectionString))
+                {
+                    connection.Open();
+
+                    foreach (var grouping in groupings)
+                    {
+                        try { BulkInsert(connection, grouping); }
+                        catch { InsertEach(connection, grouping); }
+                    }
+                }
             }
 
             async Task DelayAndLogAsync()
@@ -610,18 +666,8 @@ namespace XDARTL
                     continue;
 
                 UpdateStrikeCount(lightningBuffer.Count);
-
-                var groupings = lightningBuffer
-                    .Select((Info, Index) => new { Info, Index })
-                    .GroupBy(obj => obj.Index / GroupLimit, obj => obj.Info);
-
-                using (IDbConnection connection = new SqlConnection(dbInfo.ConnectionString))
-                {
-                    connection.Open();
-
-                    foreach (var grouping in groupings)
-                        BulkInsert(connection, grouping);
-                }
+                try { UploadLightningData(lightningBuffer); }
+                catch (Exception ex) { OnLightningException(ex); }
             }
         }
 
