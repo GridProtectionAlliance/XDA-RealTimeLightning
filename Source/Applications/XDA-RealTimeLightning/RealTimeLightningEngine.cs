@@ -470,10 +470,20 @@ namespace XDARTL
             TunnelInfo tunnelInfo = new TunnelInfo(configuration);
             Func<AsyncBufferHandler> bufferHandlerFactory = () => ToBufferHandler(HandleLightningDataAsync);
 
-            Task pollDataStreamTask = PollDataStreamAsync(sshInfo, tunnelInfo, bufferHandlerFactory, cancellationToken);
-            Task pollLightningDataTask = PollQueueAsync(dbInfo, lightningDataQueue, cancellationToken);
-            Task purgeOldRecordsTask = PurgeOldRecordsAsync(dbInfo, cancellationToken);
-            await Task.WhenAll(pollDataStreamTask, pollLightningDataTask, purgeOldRecordsTask);
+            using (CancellationTokenSource engineCancellationTokenSource = new CancellationTokenSource())
+            using (cancellationToken.Register(() => engineCancellationTokenSource.Cancel()))
+            {
+                CancellationToken engineCancellationToken = engineCancellationTokenSource.Token;
+                Task pollDataStreamTask = PollDataStreamAsync(sshInfo, tunnelInfo, bufferHandlerFactory, engineCancellationToken);
+                Task pollLightningDataTask = PollQueueAsync(dbInfo, lightningDataQueue, engineCancellationToken);
+                Task purgeOldRecordsTask = PurgeOldRecordsAsync(dbInfo, engineCancellationToken);
+
+                try { await Task.WhenAny(pollDataStreamTask, pollLightningDataTask, purgeOldRecordsTask); }
+                catch { /* The error will be raised again in a moment */ }
+                finally { engineCancellationTokenSource.Cancel(); }
+
+                await Task.WhenAll(pollDataStreamTask, pollLightningDataTask, purgeOldRecordsTask);
+            }
         }
 
         private async Task PollQueueAsync(DbInfo dbInfo, DoubleBufferedQueue<LightningInfo> queue, CancellationToken cancellationToken)
