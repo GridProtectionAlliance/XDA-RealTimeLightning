@@ -79,12 +79,14 @@ namespace XDARTL
             m_serviceHelper.ClientRequestHandlers.Add(new ClientRequestHandler("RestartEngine", "Restarts the real-time lightning data processing engine", RestartEngineRequestHandler));
 
             // Set up the real-time lightning data processing engine
+            m_shellLog.Open();
             _ = RestartEngineAsync();
         }
 
         private void ServiceHelper_ServiceStopping(object sender, EventArgs e)
         {
             StopEngineAsync().GetAwaiter().GetResult();
+            m_shellLog.Close();
 
             // Save updated settings to the configuration file
             ConfigurationFile.Current.Save();
@@ -124,6 +126,7 @@ namespace XDARTL
 
                 engine.MessageLogged += (_, args) => HandleLogMessage(args.Argument);
                 engine.WarningLogged += (_, args) => HandleWarningMessage(args.Argument);
+                engine.ShellMessageReceived += (_, args) => HandleShellMessage(args.Argument);
 
                 engine.TunnelException += (_, args) =>
                     WrapException("Exception encountered establishing SSH tunnel", args.Argument);
@@ -172,6 +175,10 @@ namespace XDARTL
         // Send the message to the service helper
         public void HandleWarningMessage(string message) =>
             m_serviceHelper.UpdateStatus(UpdateType.Warning, "{0}", message);
+
+        // Send the message to the shell log
+        public void HandleShellMessage(string message) =>
+            m_shellLog.WriteTimestampedLine(message);
 
         // Send the error to the service helper, error logger
         public void HandleException(Exception ex)

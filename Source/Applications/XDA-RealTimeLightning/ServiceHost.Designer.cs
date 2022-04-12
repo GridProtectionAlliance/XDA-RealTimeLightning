@@ -93,6 +93,7 @@ namespace XDARTL
             this.components = new System.ComponentModel.Container();
             this.m_serviceHelper = new GSF.ServiceProcess.ServiceHelper(this.components);
             this.m_remotingServer = new GSF.Communication.TcpServer(this.components);
+            this.m_shellLog = new GSF.IO.LogFile(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.m_serviceHelper)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_serviceHelper.ConnectionErrorLogger)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_serviceHelper.ConnectionErrorLogger.ErrorLog)).BeginInit();
@@ -101,6 +102,7 @@ namespace XDARTL
             ((System.ComponentModel.ISupportInitialize)(this.m_serviceHelper.ProcessScheduler)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_serviceHelper.StatusLog)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_remotingServer)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_shellLog)).BeginInit();
             // 
             // m_serviceHelper
             // 
@@ -141,6 +143,14 @@ namespace XDARTL
             this.m_remotingServer.PersistSettings = true;
             this.m_remotingServer.SettingsCategory = "RemotingServer";
             // 
+            // m_shellLog
+            // 
+            this.m_shellLog.FileName = "Logs\\XDA-RTL.ShellLog.txt";
+            this.m_shellLog.FileSize = 1;
+            this.m_shellLog.FlushTimerInterval = 1D;
+            this.m_shellLog.PersistSettings = true;
+            this.m_shellLog.SettingsCategory = "ShellLog";
+            // 
             // ServiceHost
             // 
             this.ServiceName = "Service1";
@@ -152,6 +162,7 @@ namespace XDARTL
             ((System.ComponentModel.ISupportInitialize)(this.m_serviceHelper.StatusLog)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_serviceHelper)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.m_remotingServer)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.m_shellLog)).EndInit();
 
         }
 
@@ -159,5 +170,6 @@ namespace XDARTL
 
         private GSF.ServiceProcess.ServiceHelper m_serviceHelper;
         private GSF.Communication.TcpServer m_remotingServer;
+        private GSF.IO.LogFile m_shellLog;
     }
 }

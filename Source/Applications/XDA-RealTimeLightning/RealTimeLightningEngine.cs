@@ -445,6 +445,7 @@ namespace XDARTL
         // Events
         public event EventHandler<EventArgs<string>> MessageLogged;
         public event EventHandler<EventArgs<string>> WarningLogged;
+        public event EventHandler<EventArgs<string>> ShellMessageReceived;
         public event EventHandler<EventArgs<Exception>> TunnelException;
         public event EventHandler<EventArgs<Exception>> LightningException;
         public event EventHandler<EventArgs<Exception>> PurgeException;
@@ -734,6 +735,7 @@ namespace XDARTL
                         }
 
                         System.Diagnostics.Debug.WriteLine(line.Trim());
+                        OnShellMessageReceived(line.Trim());
                         stopwatch.Restart();
                     }
                 }
@@ -936,6 +938,9 @@ namespace XDARTL
 
         private void OnWarningLogged(string message) =>
             WarningLogged?.Invoke(this, new EventArgs<string>(message + Environment.NewLine));
+
+        private void OnShellMessageReceived(string message) =>
+            ShellMessageReceived?.Invoke(this, new EventArgs<string>(message + Environment.NewLine));
 
         private void OnTunnelException(Exception ex) =>
             TunnelException?.Invoke(this, new EventArgs<Exception>(ex));
